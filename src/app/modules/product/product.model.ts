@@ -8,7 +8,7 @@ const productSchema = new Schema<TProduct>(
       ref: "Category",
       required: [true, "Category id is required"],
     },
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     price: { type: Number, required: true },
     quantity: { type: Number, required: true },
     rating: { type: Number, required: true },

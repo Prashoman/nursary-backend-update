@@ -15,7 +15,7 @@ const productGetDB = async (
   deleteQuery.forEach((element) => {
     delete baseQuery[element];
   });
-  let searchQuery;
+  let searchQuery:string  = "";
   let lowPriceQuery = 0;
   let highPriceQuery = 10000000;
   if (baseQuery.lowPrice) {
@@ -35,7 +35,7 @@ const productGetDB = async (
     return result;
   }
   if (payload.searchTerm) {
-    searchQuery = payload.searchTerm;
+    searchQuery = payload.searchTerm as string;
   }
 
   let sortQuery = "-createdAt";
@@ -43,12 +43,17 @@ const productGetDB = async (
     sortQuery = payload.sort as string;
   }
 
-  let limit = Number(payload.limit) || 2;
+  let limit = Number(payload.limit) || 1000;
   let page = Number(payload.page) || 1;
   const skip = (page - 1) * limit;
 
+  let searchFields = ["title"];
+
   const searchingProduct = Product.find({
-    title: { $regex: new RegExp(searchQuery as string, "i") },
+    // se : { $regex: new RegExp(searchQuery as string, "i") },
+    $or: searchFields.map((field) => ({
+      [field]: { $regex: new RegExp(searchQuery as string, "i") },
+    })),
   });
 
   const filterPriceProduct = searchingProduct.find({

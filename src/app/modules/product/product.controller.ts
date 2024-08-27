@@ -1,16 +1,32 @@
 import { Request, Response } from "express";
 import { ProductService } from "./product.service";
+import { sanitizeFilter } from "mongoose";
+import { Product } from "./product.model";
 
 const createProduct = async (req: Request, res: Response) => {
   try {
     const product = req.body;
+
+    const productTitle = await Product.findOne({ title: product.title });
+    if (productTitle) {
+      return res.status(400).json({
+        status:false,
+        message: "Product all ready exist",
+        data: [],
+      });
+    }
+
     const productInfo = await ProductService.productCreateDB(product);
     res.status(201).json({
       message: "Product created successfully",
       data: productInfo,
     });
   } catch (err: any) {
-    throw new Error(err);
+    return res.status(400).json({
+      status:false,
+      message: " Product all ready exist",
+      data: [],
+    });
   }
 };
 
