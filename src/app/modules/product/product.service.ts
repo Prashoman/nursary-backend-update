@@ -11,7 +11,9 @@ const productGetDB = async (
   payload: Record<string, unknown>
 ) => {
   const baseQuery = { ...payload };
-  const deleteQuery = ["searchTerm", "sort", "page", "limit"];
+  console.log({ baseQuery });
+  
+  const deleteQuery = ["searchTerm", "sort", "page", "limit","categoryId"];
   deleteQuery.forEach((element) => {
     delete baseQuery[element];
   });
@@ -49,6 +51,41 @@ const productGetDB = async (
 
   let searchFields = ["title"];
 
+  let searchCategory = "";
+  if (payload.categoryId) {
+    searchCategory = payload.categoryId as string;
+  }
+
+  if (searchCategory) {
+    const searchingProductByCategory = Product.find({
+      categoryId: searchCategory,
+    });
+
+    const searchingProduct = searchingProductByCategory.find({
+      // se : { $regex: new RegExp(searchQuery as string, "i") },
+      $or: searchFields.map((field) => ({
+        [field]: { $regex: new RegExp(searchQuery as string, "i") },
+      })),
+    });
+
+    const filterPriceProduct = searchingProduct.find({
+      $and: [
+        { price: { $gte: lowPriceQuery } },
+        { price: { $lte: highPriceQuery } },
+      ],
+    });
+
+    const sortProduct = filterPriceProduct.sort(sortQuery);
+
+    const result = await sortProduct
+      .skip(skip)
+      .limit(limit)
+      .populate("categoryId");
+    return result;
+  }
+
+
+
   const searchingProduct = Product.find({
     // se : { $regex: new RegExp(searchQuery as string, "i") },
     $or: searchFields.map((field) => ({
@@ -64,6 +101,7 @@ const productGetDB = async (
   });
 
   const sortProduct = filterPriceProduct.sort(sortQuery);
+  
 
   const result = await sortProduct
     .skip(skip)
