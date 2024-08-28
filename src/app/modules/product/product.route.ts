@@ -10,6 +10,7 @@ router.post('/products', validationMiddleware(ProductValidation.VProduct),Produc
 router.get('/products/:productId?', ProductController.getProducts);
 router.patch('/products/:productId', validationMiddleware(ProductValidation.VUProduct), ProductController.updateProduct);
 router.delete('/products/:productId', ProductController.productDelete);
+router.get('/products/category/:categoryId', ProductController.getProductByCategory);	
 
 
 

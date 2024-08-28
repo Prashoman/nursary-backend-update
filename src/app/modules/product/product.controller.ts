@@ -75,9 +75,23 @@ const productDelete = async (req: Request, res: Response) => {
     }
 }
 
+const getProductByCategory = async (req: Request, res: Response) => {
+  try{
+    const categoryId = req.params.categoryId;
+    const product = await ProductService.productGetByCategoryFromDB(categoryId);
+    res.status(200).json({
+      message: "Product fetched successfully",
+      data: product,
+    });
+  }catch(err:any){
+    throw new Error(err);
+  }
+}
+
 export const ProductController = {
   createProduct,
   getProducts,
   updateProduct,
-  productDelete
+  productDelete,
+  getProductByCategory
 };

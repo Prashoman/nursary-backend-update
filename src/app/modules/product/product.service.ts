@@ -31,7 +31,7 @@ const productGetDB = async (
     highPriceQuery = Number(payload.highPrice);
   }
   if (productId) {
-    const result = await Product.findById(productId);
+    const result = await Product.findById(productId).populate("categoryId");
     return result;
   }
   if (payload.searchTerm) {
@@ -87,9 +87,15 @@ const productDeleteDB = async (productId: string) => {
   return result;
 };
 
+const productGetByCategoryFromDB = async (categoryId: string) => {
+  const result = await Product.find({ categoryId: categoryId  }).populate("categoryId");
+  return result;
+}
+
 export const ProductService = {
   productCreateDB,
   productGetDB,
   productUpdateDB,
   productDeleteDB,
+  productGetByCategoryFromDB
 };
